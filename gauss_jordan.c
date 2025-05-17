@@ -3,7 +3,7 @@ Author: eurus
 Date: May 06, 2025
 Description: C implementation of the Gauss Jordan Algorithm 
 For Solve a system of equations AX =b.
-
+if b is the identity element then its finds the A^-1
 */
 
 
@@ -15,7 +15,7 @@ For Solve a system of equations AX =b.
 void print_Matrix(double *matrix, int numRows, int numCols);
 void augment_Matrices(double *augMatrix, double *A, int numRows, double *b, int numCols, int b_cols);
 void un_augment_Matrix(double *augMatrix, int numRows, int numCols, double *b, int b_cols);
-
+void gauss_jordan(double *matrix, int numRows, int numCols);
 
 // Main function
 int main(int argc, char *argv[]){
@@ -31,6 +31,10 @@ double un_Aug[9];
 //Augment matrix
 augment_Matrices(Aug, A, 3, b, 6, 3);
 
+//Reduce augmented matrix to RREF
+gauss_jordan(Aug, 3, 6);
+
+
 // print matrices
 printf("Matrix A \n");
 print_Matrix(A, 3, 3);
@@ -45,13 +49,13 @@ print_Matrix(Aug, 3, 6);
 printf("\n \n");
 
 
-//un-augment matrix
-un_augment_Matrix(Aug, 3, 6, un_Aug, 3);
+// //un-augment matrix
+// un_augment_Matrix(Aug, 3, 6, un_Aug, 3);
 
-// print matrices
-printf("Matrix un_Aug \n");
-print_Matrix(un_Aug, 3, 3);
-printf("\n \n");
+// // print matrices
+// printf("Matrix un_Aug \n");
+// print_Matrix(un_Aug, 3, 3);
+// printf("\n \n");
 
 
 return 0;
@@ -103,5 +107,33 @@ void un_augment_Matrix(double *augMatrix, int numRows, int numCols, double *unAu
     }
 }
 
-// TODO - Function to do RREF 
-// TODO - Function to implement Gauss-Jordan Alg
+// Function to reduce a matrix to RREF using Gauss-Jordan Elimination 
+void gauss_jordan(double *matrix, int numRows, int numCols){
+
+    for (int i = 0; i < numRows; i++){//loop through all rows
+
+        // Set pivot element
+        double pivot = *(matrix+(i*numCols + i));
+
+        //Normalize each element in for i
+        for (int j = 0; j < numCols; j++){//loop through all columns
+            *(matrix+(i*numCols + j)) /= pivot; 
+        }
+
+        //Apply row reduction to all rows except pivot row
+        for (int j = 0;j < numRows; j++){///loop through all rows
+            if (j == i) continue; //except pivot row
+
+            // set row reduction factor 
+            double factor =   *(matrix+(j*numCols + i));
+
+            for (int k = 0; k < numCols; k++){
+                *(matrix+(j*numCols + k)) -= factor * *(matrix+(i*numCols + k));
+            }
+        }
+    }
+}
+
+//TODO - Write a partial pivoting form of the Gauss-Jordan function 
+
+// TODO - Function to solve a system of equation A|b or find A^-1 if b is the identity matrix 
