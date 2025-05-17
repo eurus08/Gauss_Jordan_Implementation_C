@@ -16,6 +16,8 @@ void print_Matrix(double *matrix, int numRows, int numCols);
 void augment_Matrices(double *augMatrix, double *A, int numRows, double *b, int numCols, int b_cols);
 void un_augment_Matrix(double *augMatrix, int numRows, int numCols, double *b, int b_cols);
 void gauss_jordan(double *matrix, int numRows, int numCols);
+void SLE_solver(double *A, int A_rows, int A_cols, double *b, int b_rows, int b_cols, double *solution);
+
 
 // Main function
 int main(int argc, char *argv[]){
@@ -24,15 +26,17 @@ int main(int argc, char *argv[]){
 //Create matrices
 double A[9] = {4,5,3,7,9,5,5,6,7};
 double b[9] = {1,0,0,0,1,0,0,0,1};
-double Aug[18];
-double un_Aug[9];
+double A_inverse[9];
 
 
-//Augment matrix
-augment_Matrices(Aug, A, 3, b, 6, 3);
+// //Augment matrix
+// augment_Matrices(Aug, A, 3, b, 6, 3);
 
-//Reduce augmented matrix to RREF
-gauss_jordan(Aug, 3, 6);
+// //Reduce augmented matrix to RREF
+// gauss_jordan(Aug, 3, 6);
+
+// Solve for Inverse of A
+SLE_solver(A, 3, 3, b, 3, 3, A_inverse);
 
 
 // print matrices
@@ -44,8 +48,8 @@ printf("Matrix b \n");
 print_Matrix(b, 3, 3);
 printf("\n \n");
 
-printf("Matrix Aug \n");
-print_Matrix(Aug, 3, 6);
+printf("Matrix A^(-1) \n");
+print_Matrix(A_inverse, 3, 3);
 printf("\n \n");
 
 
@@ -69,7 +73,7 @@ void print_Matrix(double *matrix, int numRows, int numCols){
 
     for (int i = 0; i < numRows; i++){
         for (int j = 0; j< numCols; j++){
-            printf("%.2lf\t", matrix[i*numCols + j]);
+            printf("%6.2lf\t", matrix[i*numCols + j]);
             }
         printf("\n");
         }
@@ -136,4 +140,24 @@ void gauss_jordan(double *matrix, int numRows, int numCols){
 
 //TODO - Write a partial pivoting form of the Gauss-Jordan function 
 
-// TODO - Function to solve a system of equation A|b or find A^-1 if b is the identity matrix 
+
+
+// Function to solve a system of equation A|b or find A^-1 if b is the identity matrix 
+void SLE_solver(double *A, int A_rows, int A_cols, double *b, int b_rows, int b_cols, double *solution){
+
+    // Create and populate augmented matrix [A|b]
+    int numRows  = A_rows; // Number of rows for augmented matrix
+    int numCols = A_cols + b_cols; // Number of columns for augmented matrix
+
+    double augMatrix[numRows * numCols];//create augmented matrix array
+    augment_Matrices(augMatrix, A, numRows, b, numCols, b_cols);
+    
+    // //Print augmented matrix
+    // print_Matrix(augMatrix, numRows, numCols);
+
+    // Reduce augmented matrix to RREF using gauss jordan approach
+    gauss_jordan(augMatrix, numRows, numCols);
+
+    //Extract right side from augmented matrix
+    un_augment_Matrix(augMatrix, numRows, numCols, solution,b_cols);
+}
